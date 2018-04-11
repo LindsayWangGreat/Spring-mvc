@@ -19,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -97,6 +98,22 @@ public class AdvertisementControllerTest {
        
        
     }
+    @Test
+    public void deleteById() throws Exception {
+        //post
+        String id = performPostAndGetId();
+        //delete
+        mockMvc.perform(buildDeleteRequest(id))
+                .andExpect(status().isNoContent());
+                
+        
+    }
+    private MockHttpServletRequestBuilder buildDeleteRequest(String id) {
+        // TODO Auto-generated method stub
+        String pathbyId=AdvertisementController.PATH+"/"+id;
+        return delete(pathbyId).contentType(APPLICATION_JSON_UTF8);
+    }
+
     private String performPostAndGetId() throws Exception {
         MockHttpServletResponse rep = mockMvc.perform(buildPostRequest(SOME_TITLE))
                 .andExpect(status().isCreated())

@@ -1,12 +1,15 @@
 package com.sap.bulletinboard.ads.controllers;
 import org.springframework.http.MediaType; //provides constants for content types
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -64,15 +67,31 @@ public class AdvertisementController {
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(advertisement); //TODO return ResponseEntity with advertisement in the body, location header and HttpStatus.CREATED status code
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Advertisement> update(@RequestBody Advertisement advertisement,
-            @PathVariable("id") Long id) throws URISyntaxException {
+    public Advertisement update(@RequestBody Advertisement advertisement,
+            @PathVariable("id") Long id) {
+        throwIfNoneexisting(id);
+        ads.put(id, advertisement);
+        return advertisement; 
+    }
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAll() {
+        ads.clear();
+    }
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable("id") Long id){
         if(!ads.containsKey(id)) {
             throw new NotFoundException("not found id");
         }
-        ads.put(id, advertisement);
-        return ResponseEntity.status(HttpStatus.OK).body(advertisement); 
+        ads.remove(id);
+        //return ResponseEntity.noContent().build();
     }
-    
+    private void throwIfNoneexisting(Long id) {
+        if(!ads.containsKey(id)) {
+            throw new NotFoundException(id+"not found");
+        }
+    }
     public static class AdvertisementList {
         @JsonProperty("value")
         public List<Advertisement> advertisements = new ArrayList<>();
