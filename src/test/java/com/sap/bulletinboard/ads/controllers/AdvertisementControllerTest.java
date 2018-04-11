@@ -57,6 +57,13 @@ public class AdvertisementControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.title", is(SOME_TITLE))); // requires com.jayway.jsonpath:json-path
     }
+    @Test
+    public void createWithNullTitle() throws Exception {
+        mockMvc.perform(buildPostRequest(""))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(APPLICATION_JSON_UTF8));
+        
+    }
 
     @Test
     public void readAll() throws Exception {
@@ -68,7 +75,12 @@ public class AdvertisementControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.value.length()",is(both(greaterThan(0)).and(lessThan(10)))));
     }
-
+    
+    @Test
+    public void readByIdNegative() throws Exception {
+        mockMvc.perform(buildGetRequest("-1"));
+//            .andExpect(status().isBadRequest());
+    }
 
     @Test
     public void readByIdNotFound() throws Exception {
