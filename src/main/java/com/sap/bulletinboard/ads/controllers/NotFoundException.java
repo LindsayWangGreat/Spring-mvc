@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 // need to define exceptions with response status, not predefined
-@ResponseStatus(HttpStatus.NOT_FOUND)
+@ResponseStatus(code=HttpStatus.NOT_FOUND, reason="lindasy not found id")
 public class NotFoundException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
