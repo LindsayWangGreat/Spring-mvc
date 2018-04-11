@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -35,6 +36,7 @@ public class AdvertisementControllerTest {
     
     private static final String LOCATION = "Location";
     private static final String SOME_TITLE = "MyNewAdvertisement";
+    private static final String SOME_NEW_TITLE = "MyNEwUpdatedate";
 
     @Inject
     WebApplicationContext context;
@@ -84,6 +86,17 @@ public class AdvertisementControllerTest {
         .andExpect(jsonPath("$.title",is(SOME_TITLE)));
         // TODO create new advertisement using POST, then retrieve it using GET {/id}
     }
+    @Test
+    public void updateById() throws Exception {
+        //post
+        String id = performPostAndGetId();
+        //put
+        mockMvc.perform(buildPutRequest(id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title",is(SOME_NEW_TITLE)));
+       
+       
+    }
     private String performPostAndGetId() throws Exception {
         MockHttpServletResponse rep = mockMvc.perform(buildPostRequest(SOME_TITLE))
                 .andExpect(status().isCreated())
@@ -103,7 +116,11 @@ public class AdvertisementControllerTest {
         // post the advertisement as a JSON entity in the request body
         return post(AdvertisementController.PATH).content(toJson(advertisement)).contentType(APPLICATION_JSON_UTF8);
     }
-    
+    private MockHttpServletRequestBuilder buildPutRequest(String id) throws JsonProcessingException {
+        Advertisement ad = new Advertisement();
+        ad.setTitle(SOME_NEW_TITLE);
+        return put(AdvertisementController.PATH+"/" + id).contentType(APPLICATION_JSON_UTF8).content(toJson(ad));
+    }
     private String toJson(Object object) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(object);
     }
