@@ -57,33 +57,41 @@ public class AdvertisementControllerTest {
 
     @Test
     public void readAll() throws Exception {
-        
+        mockMvc.perform(buildPostRequest(SOME_TITLE))
+        .andExpect(status().isCreated());
         // TODO create new advertisement using POST, then retrieve all advertisements using GET
         mockMvc.perform(get(AdvertisementController.PATH).contentType(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.value.length()",is(1)))
-                .andExpect(jsonPath("$.value[0].title",is(SOME_TITLE)));
+                .andExpect(jsonPath("$.value.length()",is(both(greaterThan(0)).and(lessThan(10)))));
     }
+
 
     @Test
     public void readByIdNotFound() throws Exception {
         // TODO try to retrieve object with nonexisting ID using GET request to /4711
-        mockMvc.perform(buildGetRequest("1"))
+        mockMvc.perform(buildGetRequest("123"))
                 .andExpect(status().isNotFound());
         
     }
 
     @Test
     public void readById() throws Exception {
-        mockMvc.perform(buildGetRequest("0"))
+        String id = performPostAndGetId();
+        
+        mockMvc.perform(buildGetRequest(id))
         .andExpect(jsonPath("$.length()",is(1)))
         .andExpect(jsonPath("$.title",is(SOME_TITLE)));
         // TODO create new advertisement using POST, then retrieve it using GET {/id}
     }
+    private String performPostAndGetId() throws Exception {
+        MockHttpServletResponse rep = mockMvc.perform(buildPostRequest(SOME_TITLE))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
+        return getIdFromLocation(rep.getHeader(LOCATION));
+    }
     private MockHttpServletRequestBuilder buildGetRequest(String id) throws Exception {
         String pathbyId=AdvertisementController.PATH+"/"+id;
-        System.out.println(pathbyId);
         
         return get(pathbyId).contentType(APPLICATION_JSON_UTF8);
     }
