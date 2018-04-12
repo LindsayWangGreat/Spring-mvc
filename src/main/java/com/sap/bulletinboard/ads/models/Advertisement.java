@@ -1,6 +1,7 @@
 package com.sap.bulletinboard.ads.models;
 
 import java.beans.ConstructorProperties;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,5 +37,10 @@ public class Advertisement {
     }
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Long getId() {
+        // TODO Auto-generated method stub
+        return id;
     }
 }
