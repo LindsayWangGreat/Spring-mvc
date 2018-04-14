@@ -73,7 +73,7 @@ public class AdvertisementControllerTest {
         mockMvc.perform(get(AdvertisementController.PATH).contentType(APPLICATION_JSON_UTF8))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.value.length()",is(both(greaterThan(0)).and(lessThan(10)))));
+                .andExpect(jsonPath("$.length()",is(both(greaterThan(0)).and(lessThan(10)))));
     }
     
     @Test
@@ -95,21 +95,41 @@ public class AdvertisementControllerTest {
         String id = performPostAndGetId();
         
         mockMvc.perform(buildGetRequest(id))
-        .andExpect(jsonPath("$.length()",is(1)))
+        //.andExpect(jsonPath("$.length()",is(1)))
+        .andExpect(status().isOk())
         .andExpect(jsonPath("$.title",is(SOME_TITLE)));
         // TODO create new advertisement using POST, then retrieve it using GET {/id}
     }
     @Test
     public void updateById() throws Exception {
         //post
-        String id = performPostAndGetId();
+        MockHttpServletResponse rep = mockMvc.perform(buildPostRequest(SOME_TITLE))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
+        String id = getIdFromLocation(rep.getHeader(LOCATION));
+        
+        Advertisement advertisement = convertJsonContent(rep, Advertisement.class);
+        advertisement.setTitle(SOME_NEW_TITLE);
+        
         //put
-        mockMvc.perform(buildPutRequest(id))
+        mockMvc.perform(buildPutRequest(id,advertisement))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title",is(SOME_NEW_TITLE)));
        
        
     }
+    @Test
+    public void assertBadRequestifIDdiff() throws JsonProcessingException, Exception {
+        String id = performPostAndGetId();
+        
+        Advertisement putBody = new Advertisement();
+        putBody.setTitle("UnitTest:assertBadRequestifIDdiff");
+        putBody.setId(new Long(10));
+       
+        mockMvc.perform(buildPutRequest(id,putBody))
+                .andExpect(status().isBadRequest());
+    }
+    
     @Test
     public void deleteById() throws Exception {
         //post
@@ -145,10 +165,9 @@ public class AdvertisementControllerTest {
         // post the advertisement as a JSON entity in the request body
         return post(AdvertisementController.PATH).content(toJson(advertisement)).contentType(APPLICATION_JSON_UTF8);
     }
-    private MockHttpServletRequestBuilder buildPutRequest(String id) throws JsonProcessingException {
-        Advertisement ad = new Advertisement();
-        ad.setTitle(SOME_NEW_TITLE);
-        return put(AdvertisementController.PATH+"/" + id).contentType(APPLICATION_JSON_UTF8).content(toJson(ad));
+    private MockHttpServletRequestBuilder buildPutRequest(String id, Advertisement body) throws JsonProcessingException {
+
+        return put(AdvertisementController.PATH+"/" + id).contentType(APPLICATION_JSON_UTF8).content(toJson(body));
     }
     private String toJson(Object object) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(object);

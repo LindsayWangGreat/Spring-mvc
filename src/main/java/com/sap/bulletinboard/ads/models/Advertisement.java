@@ -43,4 +43,9 @@ public class Advertisement {
         // TODO Auto-generated method stub
         return id;
     }
+
+    public void setId(Long id) {
+        // TODO Auto-generated method stub
+        this.id = id;
+    }
 }
