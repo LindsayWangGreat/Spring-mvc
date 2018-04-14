@@ -1,7 +1,8 @@
 package com.sap.bulletinboard.ads.models;
 
 import org.springframework.data.repository.CrudRepository;
-
-public interface AdvertisementRepository extends CrudRepository<Advertisement, Long>{
+import org.springframework.data.repository.PagingAndSortingRepository;
+//extends CrudRepository<Advertisement, Long>
+public interface AdvertisementRepository extends PagingAndSortingRepository<Advertisement, Long>{
 
 }
