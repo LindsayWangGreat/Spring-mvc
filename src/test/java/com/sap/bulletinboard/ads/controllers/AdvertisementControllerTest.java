@@ -111,6 +111,7 @@ public class AdvertisementControllerTest {
         Advertisement advertisement = convertJsonContent(rep, Advertisement.class);
         advertisement.setTitle(SOME_NEW_TITLE);
         
+        
         //put
         mockMvc.perform(buildPutRequest(id,advertisement))
                 .andExpect(status().isOk())

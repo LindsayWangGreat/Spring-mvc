@@ -13,15 +13,19 @@ import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import org.apache.commons.logging.LogSource;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.util.logging.Log;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "advertisements")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Advertisement {
     //@JsonProperty("title")
     @NotBlank
@@ -33,8 +37,16 @@ public class Advertisement {
     
     @Column(updatable = false)
     private Timestamp createdAt;
+    @Column
     private Timestamp modifiedAt;
+    @Column
+    @Version
+    private long version;
     
+    public long getVersion() {
+        return version;
+    }
+
     public Advertisement() {
         
     }
@@ -69,6 +81,7 @@ public class Advertisement {
     @PrePersist
     protected void onPersist() {
         setCreatedAt(now());
+       
     }
     private void setCreatedAt(Timestamp now) {
         // TODO Auto-generated method stub
@@ -77,6 +90,7 @@ public class Advertisement {
     @PreUpdate
     protected void onUpdate() {
         this.modifiedAt = now();
+      
     }
     protected Timestamp now() {                       // use java.sql.Timestamp
         return new Timestamp((new Date()).getTime()); // use java.util.Date
