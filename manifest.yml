@@ -2,11 +2,15 @@
 applications:
 - name: bulletinboard-ads
   memory: 700M
-  health-check-type: http
-  health-check-http-endpoint: /health
+  #health-check-type: http
+  #health-check-http-endpoint: /health
   path: target/bulletinboard-ads.war
   buildpack: https://github.com/cloudfoundry/java-buildpack.git#v4.6
   env:
+      # Disable Spring Auto Reconfiguration
+      JBP_CONFIG_SPRING_AUTO_RECONFIGURATION: '{enabled: false}' 
       # Use the non-blocking /dev/urandom instead of the default to generate random numbers.
       # This may help with slow startup times, especially when using Spring Boot.
       JAVA_OPTS: -Djava.security.egd=file:///dev/./urandom
+  services:
+  - postgres-bulletboard-ads
